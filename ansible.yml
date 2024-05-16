@@ -18,7 +18,7 @@
 
     - name: Stop and remove existing Docker container on port 9007
       command: docker stop {{ item }} && docker rm {{ item }}
-      loop: "{{ lookup('pipe', 'docker ps -q -f "publish=9007:8082"') }}"
+      loop: "{{ lookup('pipe', 'docker ps -q -f \"publish=9007:8082\"') }}"
       ignore_errors: true
 
     - name: Deploy Docker Container
