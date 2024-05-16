@@ -20,10 +20,6 @@
       shell: docker stop $(docker ps -q)
       ignore_errors: true
 
-    - name: Remove all stopped Docker containers
-      shell: docker kill $(docker ps -aq)
-      ignore_errors: true
-
     - name: Remove all Docker images
       shell: docker rmi -f $(docker images -q)
       ignore_errors: true
