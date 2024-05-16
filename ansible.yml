@@ -17,12 +17,19 @@
       become_user: root
 
     - name: Stop all running Docker containers
-      shell: docker kill $(docker ps -q)
+      shell: docker stop $(docker ps -q)
       ignore_errors: true
 
     - name: Remove all stopped Docker containers
-      shell: docker rm $(docker ps -aq)
+      shell: docker kill $(docker ps -aq)
       ignore_errors: true
+
+    - name: Remove all Docker images
+      shell: docker rmi -f $(docker images -q)
+      ignore_errors: true
+
+    - name: Pull latest Docker image
+      shell: docker pull prashant753/staragile_project2:latest
 
     - name: Deploy Docker Container
       shell: docker run -itd -p 9007:8082 prashant753/staragile_project2:latest
