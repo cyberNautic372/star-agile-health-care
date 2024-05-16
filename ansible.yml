@@ -4,39 +4,22 @@
   connection: ssh
   tasks:
     - name: Updating apt
-      apt:
-        update_cache: yes
+      command: sudo apt-get update
 
     - name: Install Docker
-      apt:
-        name: docker.io
-        state: present
+      command: sudo apt-get install -y docker.io
+      become: yes
+      become_user: root
 
     - name: Start Docker Service
-      service:
-        name: docker
-        state: started
-        enabled: yes
+      command: sudo systemctl start docker
+      become: yes
+      become_user: root
 
-    - name: List running Docker containers
-      command: docker ps -q
-      register: running_containers
-      changed_when: false
-
-    - name: Stop running Docker containers
-      command: docker stop {{ item }}
-      loop: "{{ running_containers.stdout_lines }}"
-      when: running_containers.stdout != ''
-
-    - name: Remove stopped Docker containers
-      command: docker rm {{ item }}
-      loop: "{{ running_containers.stdout_lines }}"
-      when: running_containers.stdout != ''
-
-    # Uncomment the following task if you want to remove all Docker images
-    #- name: Remove all Docker images (optional, uncomment if needed)
-    #  command: docker rmi -f $(docker images -q)
-    #  when: running_containers.stdout != ''
+    - name: Stop and remove existing Docker container on port 9007
+      command: docker stop {{ item }} && docker rm {{ item }}
+      loop: "{{ lookup('pipe', 'docker ps -q -f "publish=9007:8082"') }}"
+      ignore_errors: true
 
     - name: Deploy Docker Container
       command: docker run -itd -p 9007:8082 prashant753/staragile_project2:latest
