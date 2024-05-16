@@ -16,9 +16,12 @@
       become: yes
       become_user: root
 
-    - name: Stop and remove existing Docker container on port 9007
-      command: docker stop {{ item }} && docker rm {{ item }}
-      loop: "{{ lookup('pipe', 'docker ps -q -f publish=9007') }}"
+    - name: Stop all running Docker containers
+      command: docker stop $(docker ps -aq)
+      ignore_errors: true
+
+    - name: Remove all stopped Docker containers
+      command: docker rm $(docker ps -aq)
       ignore_errors: true
 
     - name: Deploy Docker Container
